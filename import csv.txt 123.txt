@@ -1,0 +1,193 @@
+import csv
+import os
+
+filename = "/storage/emulated/0/students.csv"
+
+if not os.path.exists(filename):
+    with open(filename, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Roll No", "Name", "Branch", "Marks"])
+
+
+def add_student():
+    with open(filename, "a", newline="") as f:
+        writer = csv.writer(f)
+
+        roll = input("Enter Roll No: ")
+        name = input("Enter Name: ")
+        branch = input("Enter Branch: ")
+        while True:
+            try:
+                marks = int(input("Enter Marks (0-100): "))
+
+                if 0 <= marks <= 100:
+                    break
+                else:
+                    print("Please Enter Marks Between 0 and 100!")
+
+            except ValueError:
+                print("Please Enter Numbers Only!")
+        writer.writerow([roll, name, branch, marks])
+
+    print("Student Added Successfully!")
+
+
+def view_students():
+    with open(filename, "r") as f:
+        reader = csv.reader(f)
+
+        print("\n--- STUDENT RECORDS ---")
+        for row in reader:
+            print(row)
+
+
+def search_student():
+    roll = input("Enter Roll No: ")
+
+    with open(filename, "r") as f:
+        reader = csv.reader(f)
+        next(reader)
+
+        for row in reader:
+            if row[0] == roll:
+                print("Student Found:", row)
+                return
+
+    print("Student Not Found!")
+
+
+def update_student():
+    roll = input("Enter Roll No: ")
+
+    with open(filename, "r") as f:
+        rows = list(csv.reader(f))
+
+    found = False
+
+    for row in rows[1:]:
+        if row[0] == roll:
+            row[1] = input("New Name: ")
+            row[2] = input("New Branch: ")
+            row[3] = input("New Marks: ")
+            found = True
+            break
+
+    if found:
+        with open(filename, "w", newline="") as f:
+            csv.writer(f).writerows(rows)
+        print("Updated Successfully!")
+    else:
+        print("Student Not Found!")
+
+
+def delete_student():
+    roll = input("Enter Roll No: ")
+
+    with open(filename, "r") as f:
+        rows = list(csv.reader(f))
+
+    new_rows = [rows[0]]
+    found = False
+
+    for row in rows[1:]:
+        if row[0] == roll:
+            found = True
+        else:
+            new_rows.append(row)
+
+    if found:
+        with open(filename, "w", newline="") as f:
+            csv.writer(f).writerows(new_rows)
+        print("Deleted Successfully!")
+    else:
+        print("Student Not Found!")
+
+def dashboard():
+    with open(filename, "r") as f:
+        reader = csv.reader(f)
+        next(reader)
+        total = sum(1 for row in reader)
+
+    print("\n==============================")
+    print("       PROJECT DASHBOARD")
+    print("==============================")
+    print("Total Students:", total)
+    print("Database: CSV")
+    print("Status: Running Successfully")
+    print("==============================")
+def performance_report():
+    with open(filename, "r") as f:
+        reader = csv.reader(f)
+        next(reader)
+        students = list(reader)
+
+    if not students:
+        print("No Student Records Found!")
+        return
+
+    marks = [float(row[3]) for row in students]
+
+    average = sum(marks) / len(marks)
+    highest = max(students, key=lambda row: float(row[3]))
+
+    print("\n===== PERFORMANCE REPORT =====")
+
+    print("\nSTUDENT GRADES:")
+    for row in students:
+        grade = calculate_grade(float(row[3]))
+        print("Name:", row[1])
+        print("Marks:", row[3])
+        print("Grade:", grade)
+        print("----------------------")
+    print("Average Marks:", round(average, 2))
+    print("Highest Marks:", highest[3])
+    print("Topper Name:", highest[1])
+    print("==============================")
+def calculate_grade(marks):
+    if marks >= 90:
+        return "A+"
+    elif marks >= 80:
+        return "A"
+    elif marks >= 70:
+        return "B"
+    elif marks >= 60:
+        return "C"
+    elif marks >= 40:
+        return "D"
+    else:
+        return "Fail"
+print("Grade:", calculate_grade(95))
+print("Grade:", calculate_grade(85))
+print("Grade:", calculate_grade(35))
+while True:
+    print("\n===== STUDENT MANAGEMENT SYSTEM =====")
+    print("1. Add Student")
+    print("2. View Students")
+    print("3. Search Student")
+    print("4. Update Student")
+    print("5. Delete Student")
+    print("6. Exit")
+    print("7. Dashboard")
+    print("8. Performance Report")
+
+    choice = input("Enter Your Choice: ")
+
+    if choice == "1":
+        add_student()
+    elif choice == "2":
+        view_students()
+    elif choice == "3":
+        search_student()
+    elif choice == "4":
+        update_student()
+    elif choice == "5":
+        delete_student()
+    elif choice == "6":
+        print("Thank You!")
+        break
+    elif choice == "7":
+       dashboard()
+    elif choice == "8":
+         performance_report()
+    else:
+        print("Invalid Choice!")
